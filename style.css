@@ -1,7 +1,7 @@
 /* SOLITERARY - green felt like a real solitaire; every story has its own color and emoji */
 :root {
-  --c0: #e5533f; --c1: #d99a1c; --c2: #2f78c4; --c3: #2e9a62;
-  --felt-1: #3e8e4b; --felt-2: #2a6a37; --paper: #fffdf6; --ink: #25221e;
+  --c0: #f06054; --c1: #e0a82c; --c2: #2e6890; --c3: #8e3db5;
+  --felt-1: #4e964c; --felt-2: #1d5a3f; --paper: #fffdf6; --ink: #25221e;
   --cw: 168px; --ch: 100px; --strip: 54px; --down: 14px; --gap: 12px; --fs: 12.5px; --lh: 15px;
 }
 * { box-sizing: border-box; }
@@ -96,6 +96,12 @@ button { font-family: inherit; }
 .modal-box { background: #fffdf6; border-radius: 16px; padding: 22px 26px; width: min(640px, 100%); max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,.5); }
 .modal-box h2 { margin: 0 0 8px; font: 700 34px 'Caveat', cursive; }
 .modal-box p, .modal-box li { font-size: 15px; line-height: 1.45; }
+.auth { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+.auth input { font: 600 16px 'Nunito', sans-serif; padding: 10px 12px; border: 2px solid #d9d2bf; border-radius: 9px; background: #fff; color: var(--ink); }
+.auth-err { min-height: 18px; color: #b3261e; font-weight: 700; font-size: 14px; }
+.unlocked { margin-top: 18px; padding-top: 10px; border-top: 2px dashed #d9d2bf; }
+.unlocked h3 { margin: 0 0 6px; font-size: 16px; }
+.unlocked ul { margin: 0; padding-left: 20px; font-size: 14px; } .unlocked .none { font-size: 14px; opacity: .7; }
 .modal-box ul { padding-left: 20px; } .modal-box li { margin-bottom: 6px; }
 .modal-box .row { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
 .modal-box .btn { box-shadow: 0 2px 0 rgba(0,0,0,.25); background: #eee; } .modal-box .btn-main { background: #ffd76a; }
@@ -144,3 +150,76 @@ body.lvl-medium .card .tx { font-size: 1.12em; }
 .cls-table tr.done td { background: #effaf0; }
 .cls-bar-p { position: relative; height: 20px; background: #eee; border-radius: 6px; overflow: hidden; min-width: 120px; }
 .cls-bar-p i { position: absolute; inset: 0 auto 0 0; background: #7ccf8a; } .cls-bar-p span { position: relative; font-size: 12px; padding-left: 6px; line-height: 20px; }
+
+/* ---------- challenges (weekly / duel) and links ---------- */
+a.brand { color: #fff; text-decoration: none; }
+a.btn { text-decoration: none; display: inline-block; }
+.modal.lock { background: #0c3a2c; }                 /* the deal stays hidden until the player presses Go */
+.modal-box .none { font-size: 14px; opacity: .7; }
+.res { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+.res > div { background: #fff1c9; border-radius: 12px; padding: 10px 12px; display: grid; gap: 2px; text-align: center; }
+.res > div.win { outline: 4px solid #4e964c; background: #e2ebb2; }
+.res b { font-size: 13px; color: #7a5244; } .res span { font: 800 28px 'Nunito', sans-serif; } .res small { color: #555; font-weight: 700; }
+
+/* ---------- app bar (top) and game dock (bottom): the buttons of the app and the buttons of the game never mix ---------- */
+:root { --dock: 72px; }
+body { padding-bottom: calc(var(--dock) + 78px + env(safe-area-inset-bottom)); touch-action: manipulation; }
+.topbar { flex-wrap: nowrap; gap: 8px 12px; justify-content: flex-start; padding: 6px 12px; padding-top: calc(6px + env(safe-area-inset-top)); }
+.topbar .brand { margin-right: 0; }
+.topbar .stats { margin-right: auto; white-space: nowrap; gap: 14px; }
+.topbar .btn { background: rgba(255,255,255,.16); color: #fff; box-shadow: none; padding: 7px 11px; }
+.topbar .btn:hover { background: rgba(255,255,255,.3); } .topbar .btn:active { transform: none; }
+.appbtns { display: flex; gap: 6px; align-items: center; }
+.btn i { font-style: normal; } .btn .lbl { margin-left: 5px; }
+.stats .ic { display: none; font-style: normal; } .stats em { font-style: normal; }
+#accountBtn { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 260; display: flex; justify-content: center; gap: 8px; padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); background: #0f3b2b; border-top: 2px solid rgba(255,255,255,.18); }
+.dock button { flex: 1; max-width: 190px; display: grid; justify-items: center; gap: 0; padding: 6px 4px 5px; border: 0; border-radius: 14px; background: #fff8e6; color: var(--ink); font: 800 12.5px/1.15 'Nunito', sans-serif; box-shadow: 0 3px 0 rgba(0,0,0,.4); cursor: pointer; }
+.dock button i { font-style: normal; font-size: 22px; line-height: 1.15; }
+.dock button:active { transform: translateY(3px); box-shadow: none; }
+.dock button:disabled { opacity: .4; }
+.dock .d-hint { background: #ffd76a; } .dock .d-new { background: #f06054; color: #fff; }
+.class-mode .dock [data-action="hint"], .class-mode .dock [data-action="again"], .class-mode .dock [data-action="new"] { display: none; }
+.reader { bottom: calc(var(--dock) + env(safe-area-inset-bottom)); }
+.msg { bottom: calc(var(--dock) + 76px + env(safe-area-inset-bottom)); }
+
+/* phones: portrait (cards of 112px, columns scroll sideways) and landscape (everything fits) */
+body.phone .table { padding: 10px 12px 0; -webkit-overflow-scrolling: touch; }
+@media (max-width: 700px) {
+  .topbar .brand, .topbar .lbl { display: none; }
+  .topbar { padding-left: 8px; padding-right: 8px; gap: 6px; }
+  .topbar .btn { padding: 7px 9px; font-size: 14px; }
+  .topbar .stats { font-size: 14px; gap: 10px; justify-content: center; }
+  .stats .ic { display: inline; } .stats .lbl { display: none; }
+  #accountBtn { max-width: 84px; }
+}
+/* phone in portrait: all 7 columns fit. Cards are small: emoji + the first words; a tap shows the whole sentence in the reader bar */
+body.tiny .table { padding: 8px 6px 0; }
+body.tiny .top-row { margin-bottom: 14px; }
+body.tiny .pile { border-width: 1.5px; border-radius: 7px; } body.tiny .pile.found { border-width: 2px; }
+body.tiny .card { padding: 3px 2px 0 2px; border-width: 1.5px; border-left-width: 5px; border-radius: 7px; hyphens: auto; word-break: break-word; }
+body.tiny .card .em { float: none; display: block; font-size: 19px; line-height: 1.05; margin: 0; text-align: center; }
+body.tiny .card .tx { font-size: 8.5px; line-height: 10px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; text-align: left; }
+body.tiny .card.cut .tx { display: none; }
+body.tiny .pile.found .card .tx, body.tiny .pile.stock .card .tx { display: none; }
+body.tiny .ghost { padding: 2px; } body.tiny .ghost em { font-size: 22px; } body.tiny .ghost small { display: none; }
+body.tiny .cnt { top: -9px; right: 0; font-size: 10px; padding: 0 4px; border-width: 1.5px; }
+body.tiny .recycle { font-size: 24px; }
+body.tiny .card.sel { transform: translateY(-3px); }
+body.phone .reader { min-height: 64px; padding: 8px 14px; font-size: 19px; line-height: 1.25; }
+body.phone .reader.hole { font-size: 14px; min-height: 48px; }
+body.phone .dock button { font-size: 11.5px; }
+@media (max-height: 520px) {                       /* phone on its side: small buttons, only the icons */
+  :root { --dock: 46px; }
+  body { padding-bottom: calc(var(--dock) + 52px); }
+  .dock { padding: 4px 10px calc(4px + env(safe-area-inset-bottom)); } .dock button { grid-auto-flow: column; justify-content: center; align-items: center; gap: 6px; padding: 5px 4px; font-size: 12px; }
+  .dock button i { font-size: 17px; }
+  body.phone .reader { min-height: 34px; padding: 4px 12px; font-size: 14px; }
+  body.phone .top-row .pile { height: 62px; } .topbar { padding-top: 3px; padding-bottom: 3px; }
+  .msg { bottom: calc(var(--dock) + 48px); }
+}
+.rdl { list-style: none; padding: 0 !important; margin: 4px 0 0; display: grid; gap: 4px; }
+.rdl .rd { width: 100%; text-align: left; background: #fff1c9; border: 0; border-radius: 9px; padding: 8px 10px; font: 700 14px 'Nunito', sans-serif; color: var(--ink); cursor: pointer; display: flex; gap: 6px; }
+.rdl .rd small { margin-left: auto; color: #7a4a00; font-weight: 800; }
+.drawer { padding-bottom: 100px; }

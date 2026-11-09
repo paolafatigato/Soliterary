@@ -2,50 +2,100 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0b4e87">
   <title>Soliterary</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="home.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">Soli<span>terary</span></div>
-    <div class="stats" id="stats"></div>
-    <div class="actions">
-      <button class="btn" data-action="undo" id="undoBtn">↶ Undo</button>
-      <button class="btn" data-action="hint">💡 Hint</button>
-      <button class="btn" data-action="stories">📖 My stories</button>
-      <button class="btn" data-action="again">Deal again</button>
-      <button class="btn btn-main" data-action="new">New stories</button>
-      <button class="btn" data-action="rules">? Rules</button>
+  <header class="top">
+    <a class="logo" href="#home" data-go="home">Soli<span>terary</span></a>
+    <nav class="tabs" id="tabsTop" aria-label="Main"></nav>
+    <div class="who">
+      <span class="chip-streak" id="streakChip" hidden></span>
+      <button class="btn small" id="accountBtn">👤 Sign in</button>
     </div>
   </header>
 
+  <main>
+    <!-- ================= HOME ================= -->
+    <section class="screen" id="s-home">
+      <div class="hero">
+        <div class="fan" id="fan" aria-hidden="true"></div>
+        <h1>Put the stories back together</h1>
+        <p class="lead">Four mixed-up stories, forty cards. Put every sentence in its place and clear the table!</p>
+        <a class="play" id="playBtn" href="game.html"><span class="tri">▶</span> Play</a>
+        <a class="how" href="game.html#rules">How to play</a>
+      </div>
 
-  <main class="table" id="table">
-    <div class="board" id="board"></div>
+      <div class="bar-card" id="homeProgress"></div>
+
+      <div class="tiles">
+        <button class="tile t-cat" data-go="categories">
+          <i>🗂️</i><b>Categories</b><span id="tileCat">Pick stories by author, topic or genre</span>
+        </button>
+        <button class="tile t-event" data-go="events">
+          <i>🏆</i><b>Weekly challenge</b><span id="tileEvent">Same deal for everybody</span>
+        </button>
+        <button class="tile t-prof" data-go="profile">
+          <i>👤</i><b>Profile</b><span id="tileProf">Stats, medals, friends, duels</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= CATEGORIES ================= -->
+    <section class="screen" id="s-categories" hidden>
+      <h2 class="title">Categories</h2>
+      <p class="sub">Choose what to read. Pick a category, then play with random stories from it or choose your favorites.</p>
+      <div class="seg" id="catKinds" role="tablist">
+        <button data-kind="authors" class="on">✒️ Authors</button>
+        <button data-kind="topics">💡 Topics</button>
+        <button data-kind="genres">🎭 Genres</button>
+      </div>
+      <input class="search" id="catSearch" type="search" placeholder="Search a category…" autocomplete="off">
+      <div class="cats" id="cats"></div>
+    </section>
+
+    <!-- ================= EVENTS ================= -->
+    <section class="screen" id="s-events" hidden>
+      <h2 class="title">Events</h2>
+      <div id="eventBox"></div>
+    </section>
+
+    <!-- ================= PROFILE ================= -->
+    <section class="screen" id="s-profile" hidden>
+      <div id="profHead"></div>
+      <div class="seg" id="profTabs" role="tablist">
+        <button data-pt="stats" class="on">📊 Stats</button>
+        <button data-pt="medals">🏅 Medals</button>
+        <button data-pt="library">📖 Library</button>
+        <button data-pt="friends">👥 Friends<i class="dot" id="dotFriends" hidden></i></button>
+        <button data-pt="duels">⚔️ Duels<i class="dot" id="dotDuels" hidden></i></button>
+      </div>
+      <div id="profBody"></div>
+    </section>
   </main>
 
-  <div class="msg" id="msg"></div>
-  <div class="reader" id="reader"></div>
+  <nav class="tabs bottom" id="tabsBottom" aria-label="Main"></nav>
 
-  <aside class="drawer" id="drawer">
-    <button class="btn close" data-action="stories">✕</button>
-    <h2>My stories</h2>
-    <div id="drawerBody"></div>
-  </aside>
-
+  <div class="sheet-bg" id="sheetBg" hidden>
+    <div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
+  </div>
+  <div class="toast" id="toast"></div>
   <div class="modal" id="modal" hidden><div class="modal-box" id="modalBox"></div></div>
 
   <script src="stories.js"></script>
   <script src="levels.js"></script>
   <script src="classics.js"></script>
   <script src="chapters.js"></script>
-  <script src="grammar.js"></script>
-  <script src="engine.js"></script>
-  <script src="script.js"></script>
+  <script src="catalog.js"></script>
+  <script src="progress.js"></script>
+  <script src="home.js"></script>
+  <script type="module" src="cloud.js"></script>
+  <script type="module" src="net.js"></script>
 </body>
 </html>
