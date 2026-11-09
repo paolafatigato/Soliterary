@@ -9,6 +9,10 @@
 
   const BLANK = { played: 0, cleared: 0, bestTime: 0, bestMoves: 0, totalTime: 0, totalMoves: 0, streak: 0, bestStreak: 0, lastDay: '', weeks: [] };
   const stats = () => Object.assign({}, BLANK, load(STATS_KEY, {}));
+  // Pro is decided by the account; cloud.js keeps this copy fresh (a Pro player never sees a finished story again and can read the library)
+  const PRO_KEY = 'soliterary-pro';
+  const isPro = () => { try { return localStorage.getItem(PRO_KEY) === '1'; } catch (e) { return false; } };
+  const setPro = v => { try { localStorage.setItem(PRO_KEY, v ? '1' : '0'); } catch (e) { /* fine */ } };
   const solved = () => load(SOLVED_KEY, []).filter(id => STORIES.some(s => s.id === id));
 
   const dayKey = d => { const x = d || new Date(); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); };
@@ -95,6 +99,6 @@
     return { week: id, theme: g.name, emoji: g.emoji, ids: ids.slice(0, 4), seed: hash('deal' + id) };
   }
 
-  window.Progress = { stats, solved, recordStart, recordWin, recordWeek, merge, streakNow, level, LEVELS, fmt, fmtT, dayKey,
+  window.Progress = { isPro, setPro, stats, solved, recordStart, recordWin, recordWeek, merge, streakNow, level, LEVELS, fmt, fmtT, dayKey,
     weekId, weekStart, weekEnd, prevWeek, weekPlan, hash, mulberry32, SOLVED_KEY, STATS_KEY };
 })();

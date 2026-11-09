@@ -223,3 +223,4 @@ body.phone .dock button { font-size: 11.5px; }
 .rdl .rd { width: 100%; text-align: left; background: #fff1c9; border: 0; border-radius: 9px; padding: 8px 10px; font: 700 14px 'Nunito', sans-serif; color: var(--ink); cursor: pointer; display: flex; gap: 6px; }
 .rdl .rd small { margin-left: auto; color: #7a4a00; font-weight: 800; }
 .drawer { padding-bottom: 100px; }
+.rdl .lk { padding: 6px 10px; font: 700 14px 'Nunito', sans-serif; background: #f3f0e6; border-radius: 9px; color: #777; }

@@ -51,14 +51,15 @@
     const pool = catIds(), base = pool ? STORIES.filter(s => pool.includes(s.id)) : STORIES;
     const chosen = first ? (params.get('stories') || '').split(',').filter((id, i, a) => STORIES.some(s => s.id === id) && a.indexOf(id) === i).slice(0, 4) : [];
     const need = 4 - chosen.length;
-    let seen = readSeen().filter(id => STORIES.some(s => s.id === id));
-    let fresh = base.filter(s => !chosen.includes(s.id) && !seen.includes(s.id));
-    if (fresh.length < need) { seen = seen.filter(id => !base.some(s => s.id === id)); fresh = base.filter(s => !chosen.includes(s.id)); }
-    if (fresh.length < need) fresh = STORIES.filter(s => !chosen.includes(s.id));
-    const picked = chosen.map(id => STORIES.find(s => s.id === id)).concat(E.shuffle(fresh.slice()).slice(0, need));
-    games = E.shuffle(picked).map(g => Object.assign({}, g));
+    // free player: always random, a story already completed can come back. Pro player: a completed story never comes back in a
+    // normal game (stories started but not finished can); it only returns in the weekly challenge and duels, which are the same for everybody
+    const done = new Set(Progress.isPro() ? Progress.solved() : []);
+    const ok = s => !chosen.includes(s.id) && !done.has(s.id);
+    const tiers = [base.filter(ok), STORIES.filter(ok), STORIES.filter(s => !chosen.includes(s.id))];     // the category first, then the others, and only when everything is done the finished ones
+    const extra = [];
+    tiers.forEach(t => E.shuffle(t.slice()).forEach(s => { if (extra.length < need && !extra.includes(s)) extra.push(s); }));
+    games = E.shuffle(chosen.map(id => STORIES.find(s => s.id === id)).concat(extra)).map(g => Object.assign({}, g));
     applyLevel();
-    writeSeen(seen.concat(games.map(g => g.id)));
   }
 
   // every story has its text for the three levels (levels.js): the cards show the one of the chosen level
@@ -219,10 +220,12 @@
   // all the stories completed so far (saved in the account when signed in)
   function unlockedList() {
     const ids = readSolved().filter(id => STORIES.some(s => s.id === id));
-    const li = ids.map(id => { const s = STORIES.find(x => x.id === id); return `<li><button class="rd" data-read="${id}">${s.emoji} ${esc(s.title)} <small>read</small></button></li>`; }).join('');
+    const pro = Progress.isPro();       // reading a finished story again is a Pro feature
+    const li = ids.map(id => { const s = STORIES.find(x => x.id === id); return pro ? `<li><button class="rd" data-read="${id}">${s.emoji} ${esc(s.title)} <small>read</small></button></li>` : `<li class="lk">${s.emoji} ${esc(s.title)}</li>`; }).join('');
     const who = window.SoliteraryCloud && window.SoliteraryCloud.user();
     return `<div class="unlocked"><h3>🏆 Unlocked stories: ${ids.length}/${STORIES.length}</h3>
       ${li ? `<ul class="rdl">${li}</ul>` : '<p class="none">Complete a story and it will appear here.</p>'}
+      ${pro || !ids.length ? '' : '<p class="none">🔒 Reading your finished stories again is a Pro feature.</p>'}
       ${who ? '' : '<p class="none">Sign in (👤 at the top) to keep them forever.</p>'}</div>`;
   }
 
@@ -490,7 +493,7 @@
 
   // a story already completed (from "My stories"): the whole text, to read again
   function readStory(id) {
-    const g = STORIES.find(s => s.id === id); if (!g) return;
+    const g = STORIES.find(s => s.id === id); if (!g || !Progress.isPro()) return;
     $('modalBox').innerHTML = `<h2>${g.emoji} ${esc(g.title)}</h2><div class="story c0"><p class="told big">${esc(g.lines.join(' '))}</p>${srcLine(g)}</div><div class="row"><button class="btn btn-main" data-action="close">Close</button></div>`;
     $('modal').hidden = false;
   }

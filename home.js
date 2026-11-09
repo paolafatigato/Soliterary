@@ -57,7 +57,7 @@
     const n = P.solved().length, lv = P.level(n), pct = Math.round(n / STORIES.length * 100);
     $('homeProgress').innerHTML = `<div class="bar-top"><span>${lv.emoji} ${lv.name}</span><span>📖 ${n}/${STORIES.length} stories unlocked</span></div>
       <div class="bar"><i style="width:${Math.max(pct, 2)}%"></i></div>
-      <div class="bar-note">${n ? `<a href="#library" class="liblink" data-go="profile" data-tab="library">📖 Read my ${n} unlocked ${n === 1 ? 'story' : 'stories'}</a> · ` : ''}${lv.next ? `${lv.next - n} more stories to become a ${lv.nextName}` : 'You reached the top level!'}</div>`;
+      <div class="bar-note">${n && P.isPro() ? `<a href="#library" class="liblink" data-go="profile" data-tab="library">📖 Read my ${n} unlocked ${n === 1 ? 'story' : 'stories'}</a> · ` : ''}${lv.next ? `${lv.next - n} more stories to become a ${lv.nextName}` : 'You reached the top level!'}</div>`;
     $('tileCat').textContent = `${STORIES.length} stories · ${CAT.groups('authors').length} authors`;
     const wk = P.weekId(), plan = P.weekPlan(wk);
     $('tileEvent').textContent = `${plan.emoji} ${plan.theme} week · ends in ${when((P.weekEnd(wk) - Date.now()) / 1000)}`;
@@ -101,7 +101,7 @@
     updateGo(g);
   }
   function updateGo(g) {
-    const pro = FREE_CATEGORY_PLAY || (cloud() && cloud().isPro());
+    const pro = FREE_CATEGORY_PLAY || P.isPro();
     $('goCat').textContent = (pro ? '▶ ' : '🔒 ') + (picked.length ? (picked.length < 4 ? `Play: ${picked.length} chosen + ${4 - picked.length} random` : 'Play these 4') : 'Play 4 random stories from here');
     $('goHint').textContent = pro ? 'Tap stories to choose them (up to 4). The others are picked for you.' : 'Choosing stories and playing a category is a Pro feature.';
     document.querySelectorAll('.pick').forEach(p => p.classList.toggle('on', picked.includes(p.dataset.pick)));
@@ -112,12 +112,13 @@
     const p = e.target.closest('[data-pick]');
     if (p) {
       const id = p.dataset.pick;
+      if (P.isPro() && P.solved().includes(id)) { toast('You already completed this one: it will not come back. Find it in your Library.'); return; }
       if (picked.includes(id)) picked = picked.filter(x => x !== id);
       else if (picked.length < 4) picked.push(id); else toast('Four stories at most: the table has four piles.');
       updateGo(g); return;
     }
     if (e.target.closest('#goCat')) {
-      if (!(FREE_CATEGORY_PLAY || (cloud() && cloud().isPro()))) { proInfo(); return; }
+      if (!(FREE_CATEGORY_PLAY || P.isPro())) { proInfo(); return; }
       location.href = 'game.html?cat=' + encodeURIComponent(k) + (picked.length ? '&stories=' + picked.join(',') : '');
     }
   });
@@ -127,7 +128,8 @@
     $('sheetBg').hidden = true;
     $('modalBox').innerHTML = `<h2>⭐ Soliterary Pro</h2>
       <p>Free: unlimited random games, the weekly challenge, friends and duels.</p>
-      <p><b>Pro</b> lets you choose the stories: play your favorite authors, topics and genres, and win the medals of the masters.</p>
+      <p><b>Pro</b> lets you choose the stories: play your favorite authors, topics and genres, and win the medals of the masters. A story you finished never comes back in your games, and you can read all your finished stories again in your Library.</p>
+      <p>Without Pro the stories are always random (a finished one can come back) and finished stories cannot be read again.</p>
       <p>Pro is coming soon!</p><div class="row"><button class="btn" data-close-modal>Got it</button></div>`;
     $('modal').hidden = false;
   }
@@ -231,13 +233,14 @@
 
   // ---------- library: the stories already completed, to read again
   function libraryHtml() {
+    if (!P.isPro()) return '<div class="gate"><i>🔒</i><h3>The Library is a Pro feature</h3><p>With Pro you can read again every story you finished, and finished stories never come back in your games.</p><button class="btn main" data-pro>See Pro</button></div>';
     const solved = new Set(P.solved()), ids = STORIES.filter(s => solved.has(s.id));
     if (!ids.length) return '<div class="gate"><i>📖</i><h3>Your library is empty</h3><p>Every story you complete is kept here, so you can read it again whenever you like.</p><a class="btn main" href="game.html">▶ Play</a></div>';
     return `<div class="note">📖 ${ids.length} of ${STORIES.length} stories unlocked. Tap one to read it.</div>
       <ul class="pick-list lib">${ids.map(s => `<li><button class="pick" data-read="${s.id}"><i>${s.emoji}</i><span><b>${esc(s.title)}</b><small>${s.source ? esc(s.source.book + ' · ' + s.source.author) : 'Soliterary original'}</small></span><span class="ok">📖</span></button></li>`).join('')}</ul>`;
   }
   function readStory(id) {
-    const s = story(id); if (!s) return;
+    const s = story(id); if (!s || !P.isPro()) return;
     $('sheet').dataset.cat = '';
     $('sheet').innerHTML = `<button class="btn small x" data-close>✕</button><h2>${s.emoji} ${esc(s.title)}</h2>
       <p class="told">${esc(s.lines.join(' '))}</p>
@@ -245,7 +248,7 @@
       <div class="go"><button class="btn main" data-close>Close</button></div>`;
     $('sheetBg').hidden = false;
   }
-  $('profBody').addEventListener('click', e => { const r = e.target.closest('[data-read]'); if (r) readStory(r.dataset.read); });
+  $('profBody').addEventListener('click', e => { const r = e.target.closest('[data-read]'); if (r) readStory(r.dataset.read); if (e.target.closest('[data-pro]')) proInfo(); });
 
   // ---------- medals
   function medalList(st) {

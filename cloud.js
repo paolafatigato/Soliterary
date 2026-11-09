@@ -113,6 +113,7 @@ async function sync(u) {
     if (!pro && u.email === OWNER_EMAIL) {           // the owner is Pro for free (firestore.rules checks the verified email)
       try { await updateDoc(ref, { pro: true }); pro = true; } catch (e) { console.warn('Soliterary: owner Pro refused (verify the email / use Google)', e); }
     }
+    Progress.setPro(pro);
     writeSolved(solved);
     window.dispatchEvent(new CustomEvent('soliterary:synced'));
   } catch (e) {
@@ -224,7 +225,7 @@ document.addEventListener('click', async e => {
 const btn = () => $('accountBtn');
 onAuthStateChanged(auth, async u => {
   user = u;
-  if (!u) { pro = false; nick = ''; code = ''; }
+  if (!u) { pro = false; nick = ''; code = ''; Progress.setPro(false); }
   if (btn()) btn().textContent = u ? '👤 ' + firstWord(u) : '👤 Sign in';
   if (u) await sync(u);
   else window.dispatchEvent(new CustomEvent('soliterary:synced'));
