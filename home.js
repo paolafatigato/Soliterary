@@ -156,6 +156,8 @@
   let boardTab = 'time';
   async function renderEvents() {
     const box = $('eventBox'), wk = P.weekId(), plan = P.weekPlan(wk);
+    // special box for this week only (2026-W46): Giulia's birthday. The link opens her page (index.html#giulia).
+    $('giuliaBox').innerHTML = wk === '2026-W46' ? `<a class="event gi-box" href="#giulia"><div class="ev-top"><h3>🎂 Giulia’s Birthday</h3><span class="count">🎁 this week</span></div><p style="margin:8px 0 0;font-weight:700">A special deck of stories, just for her. Tap to open!</p></a>` : '';
     const end = P.weekEnd(wk), n = net(), u = me();
     const head = (ev, mineHtml, cta) => `<div class="event">
       <div class="ev-top"><h3>🏆 Weekly challenge</h3><span class="count">⏳ ${when((end - Date.now()) / 1000)} left</span></div>

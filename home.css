@@ -257,3 +257,4 @@ main { max-width: 1060px; margin: 0 auto; padding: var(--pad); }
 .gi-sum { display: flex; align-items: center; gap: 10px; font-size: 18px; }
 .gi-sum i { font-style: normal; font-size: 28px; } .gi-sum b { font-family: 'Fredoka', sans-serif; flex: 1; }
 .gi-more { text-align: center; margin-bottom: 14px; }
+.gi-box { display: block; text-decoration: none; color: inherit; margin-top: 14px; background: linear-gradient(135deg, var(--blush), var(--lemon) 55%, var(--aqua)); }
