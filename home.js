@@ -36,6 +36,7 @@
   function fromHash() {
     const h = location.hash.slice(1);
     if (['friends', 'duels', 'medals', 'stats', 'library'].includes(h)) go('profile', h);
+    else if (h === 'giulia' && window.GIULIA_ACTIVE) go('giulia');
     else go(NAV.some(n => n[0] === h) ? h : 'home');
   }
   document.addEventListener('click', e => {
@@ -45,9 +46,21 @@
   window.addEventListener('hashchange', fromHash);
 
   function render() {
-    ({ home: renderHome, categories: renderCats, events: renderEvents, profile: renderProfile })[screen]();
+    ({ home: renderHome, categories: renderCats, events: renderEvents, profile: renderProfile, giulia: renderGiulia })[screen]();
     const st = P.stats(), s = P.streakNow(st);
     $('streakChip').hidden = !s; $('streakChip').textContent = '🔥 ' + s;
+  }
+
+  // ============================================================ GIULIA (secret page, only by the link #giulia)
+  function renderGiulia() {
+    const ids = window.GIULIA_IDS || [], solved = new Set(P.solved());
+    $('s-giulia').innerHTML = `<div class="gi-hero"><div class="gi-confetti" aria-hidden="true">🎂 🎈 🌈 🎉 ✨ 🎁</div>
+        <h1>Happy birthday, Giulia!</h1>
+        <p class="lead">Tanti auguri, bossy girl! Six stories about you, cut in 60 cards. Put them back together.</p>
+        <a class="play" href="game.html?deck=giulia"><span class="tri">▶</span> Play your deck</a></div>
+      <h2 class="title">Your six stories</h2>
+      <p class="sub">Tap a title to read it. Or play first and read the story when you complete it!</p>
+      <div class="gi-list">${ids.map(id => { const s = story(id); return `<details class="gi-card"><summary><i>${s.emoji}</i><b>${esc(s.title)}</b><span>${solved.has(id) ? '✅' : ''}</span></summary><p>${esc(s.full)}</p></details>`; }).join('')}</div>`;
   }
 
   // ============================================================ HOME

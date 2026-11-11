@@ -90,7 +90,7 @@
   }
   // the week has a genre as theme; 4 of its stories and a seed for the deal
   function weekPlan(id) {
-    const genres = CATALOG.groups('genres').filter(g => g.ids.length >= 4).map(g => g.key).sort();
+    const genres = CATALOG.groups('genres').filter(g => g.ids.length >= 4 && g.key !== 'giulia').map(g => g.key).sort();
     const [y, w] = id.split('-W').map(Number);
     const key = genres[(y * 53 + w) % genres.length], g = CATALOG.group('genres', key);
     const rnd = mulberry32(hash('pick' + id));

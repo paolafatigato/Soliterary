@@ -43,6 +43,7 @@
   const params = new URLSearchParams(location.search);
   const mode = params.get('week') !== null ? 'weekly' : params.get('duel') ? 'duel' : '';
   function catIds() {
+    if (params.get('deck') === 'giulia' && window.GIULIA_IDS) return window.GIULIA_IDS;
     const c = params.get('cat'); if (!c) return null;
     const k = c.split(':')[0], g = window.CATALOG && CATALOG.group(k, c.slice(k.length + 1));
     return g ? g.ids : null;

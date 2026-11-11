@@ -16,6 +16,7 @@
     tragedy: { name: 'Shakespeare: tragedy', emoji: '🎭' },
     comedy:  { name: 'Shakespeare: comedy', emoji: '🃏' },
     growing: { name: 'Growing up',         emoji: '🎒' },
+    giulia:  { name: 'For Giulia',         emoji: '🎂' },
     daily:   { name: 'Everyday life',      emoji: '🏠' },
   };
   const TOPICS = {
@@ -75,6 +76,8 @@
     montecristo: 'advent|sea,treasure', mobydick: 'advent|sea,monsters', timemachine: 'scifi|journey,monsters', sleepyhollow: 'gothic|ghosts,tricks',
     redheaded: 'mystery|crime,tricks', midas: 'myth|kings,magic,food', theseus: 'myth|monsters', arachne: 'myth|magic',
     narcissus: 'myth|love', bluebeard: 'fairy|crime', puss: 'fairy|animals,tricks', bremen: 'fairy|animals,friends',
+    // ---- secret deck (giulia.js, loaded only with #giulia)
+    gschool: 'giulia|school,friends', gcar: 'giulia|love', gbear: 'giulia|love,monsters,tricks', gfive: 'giulia|love,journey', groad: 'giulia|friends,journey', gclimb: 'giulia|sport',
     snowqueen: 'fairy|magic,friends', aladdin: 'fairy|magic,treasure', wolfcry: 'fairy|animals,tricks', tortoise: 'fairy|animals,sport',
   };
 
@@ -87,7 +90,7 @@
     'Arthur Conan Doyle': '🔎', 'Mark Twain': '🛶', 'J. M. Barrie': '🧚', 'L. Frank Baum': '🌪️', 'Rudyard Kipling': '🐍', 'Mary Shelley': '⚡',
     'Bram Stoker': '🦇', 'H. G. Wells': '👽', 'Jonathan Swift': '🧍', 'Daniel Defoe': '🏝️', 'Louisa May Alcott': '✂️', 'L. M. Montgomery': '🧑‍🦰',
     'Carlo Collodi': '🪵', 'Miguel de Cervantes': '🛡️', 'Sir Thomas Malory': '⚔️' };
-  AUTHOR_EMOJI[TRADITION] = '📜'; AUTHOR_EMOJI['Soliterary originals'] = '📖';
+  AUTHOR_EMOJI['Giulia’s birthday deck'] = '🎂'; AUTHOR_EMOJI[TRADITION] = '📜'; AUTHOR_EMOJI['Soliterary originals'] = '📖';
 
   const byId = {};
   STORIES.forEach(s => {

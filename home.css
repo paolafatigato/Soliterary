@@ -240,3 +240,16 @@ main { max-width: 1060px; margin: 0 auto; padding: var(--pad); }
 .src { background: var(--lemon); border-radius: 12px; padding: 9px 12px; font-weight: 700; font-size: 14px; margin: 0 0 6px; }
 .liblink { color: var(--coral-d); font-weight: 800; }
 @media (min-width: 760px) { .lib { grid-template-columns: 1fr 1fr; } }
+
+/* ---------- secret page for Giulia (#giulia) ---------- */
+.gi-hero { text-align: center; padding: 22px 16px; border-radius: 22px; background: linear-gradient(135deg, var(--blush), var(--lemon) 45%, var(--aqua)); margin-bottom: 18px; }
+.gi-hero h1 { margin: 4px 0 6px; font-size: 38px; color: var(--magenta); }
+.gi-hero .lead { font-weight: 700; margin: 0 0 14px; }
+.gi-confetti { font-size: 30px; letter-spacing: 4px; }
+.gi-list { display: grid; gap: 10px; }
+.gi-card { background: var(--paper); border-radius: 16px; padding: 12px 14px; box-shadow: 0 2px 0 rgba(0,0,0,.08); }
+.gi-card summary { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 18px; list-style: none; }
+.gi-card summary::-webkit-details-marker { display: none; }
+.gi-card summary i { font-style: normal; font-size: 28px; }
+.gi-card summary b { font-family: 'Fredoka', sans-serif; flex: 1; }
+.gi-card p { margin: 10px 0 2px; font-weight: 600; line-height: 1.5; }
