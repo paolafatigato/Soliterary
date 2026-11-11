@@ -70,6 +70,12 @@
     orpheus: 'myth|love,ghosts', excalibur: 'myth|kings,magic', beowulf: 'myth|monsters', bridge: 'myth|friends,tricks',
     // ---- growing up
     oliver: 'growing|school,food', pip: 'growing|crime,school', greenhair: 'growing|school,friends', jo: 'growing|school,friends',
+    // ---- added 2026-11-10
+    magi: 'daily|love', necklace: 'daily|tricks', monkeypaw: 'gothic|magic', rip: 'fantasy|magic',
+    montecristo: 'advent|sea,treasure', mobydick: 'advent|sea,monsters', timemachine: 'scifi|journey,monsters', sleepyhollow: 'gothic|ghosts,tricks',
+    redheaded: 'mystery|crime,tricks', midas: 'myth|kings,magic,food', theseus: 'myth|monsters', arachne: 'myth|magic',
+    narcissus: 'myth|love', bluebeard: 'fairy|crime', puss: 'fairy|animals,tricks', bremen: 'fairy|animals,friends',
+    snowqueen: 'fairy|magic,friends', aladdin: 'fairy|magic,treasure', wolfcry: 'fairy|animals,tricks', tortoise: 'fairy|animals,sport',
   };
 
   // authors that are really a tradition: they go together

@@ -75,15 +75,15 @@
       case 'WITH': return f.has('act');                 // with his sister / with a basket
       case 'DIR': return f.has('mot');                  // into the forest / across the river
       case 'MOD': return f.has('tr');                   // a house made of candy (after an object)
-      case 'TO': case 'SRC': case 'ONTO': return f.has('di');   // told a lie to the fairy / bought dye from a peddler / sewed it onto his foot
+      case 'TO': case 'SRC': case 'ONTO': return f.has('di') || f.has('mot');   // told a lie to the fairy / bought dye from a peddler / sewed it onto his foot
       case 'LIKE': return f.has('act');                 // like a lizard
-      case 'DUR': return f.has('dur');
+      case 'DUR': return f.has('dur') || f.has('act');
       case 'FROM': return f.has('mot');
       case 'TOHOUSE': return f.has('toh');
       case 'NET': return f.has('net');
       case 'PAST': return f.has('past');
       case 'INSTR': return f.has('tr');
-      case 'BEN': return f.has('ben');
+      case 'BEN': return f.has('ben') || f.has('act');
       case 'OF': return f.has('lm');
       case 'LIST': return f.has('list');
       case 'AIR': return f.has('air');
@@ -106,11 +106,13 @@
 
   /** can b come right after a? (a, b = parsed halves) */
   function fits(a, b) {
+    const ppComma = a.k === 'PP' && a.f.has('m');                              // a PP in the middle of a sentence, maybe with a comma (He covered his face, with his hands, to see)
     a = norm(a);
     if (endS(a.t)) return upper(b.t) && b.k !== 'QUOTE';                       // a new sentence starts with a capital letter
     if (a.k === 'X') return false;
     if (!lower(b.t)) {                                                          // a capital letter in the middle of a sentence: only a name or a quotation
       if (a.k === 'V' && a.a === 'said' && b.k === 'QUOTE') return true;
+      if (a.k === 'V' && a.a !== 'said' && b.k === 'NP' && isName(b.t)) return true;   // Alice found | Doctor Jekyll | ...
       return a.k === 'ADV' && isName(b.t) && NAME_OK.includes(b.k);
     }
     switch (a.k) {
@@ -121,13 +123,13 @@
       case 'CLn': case 'CLc':
         if (b.k === 'SO' || b.k === 'BUT') return true;
         if (b.k === 'AND') return true;                        // and + clause, or and + verb phrase with the same subject
-        if (b.k === 'REL') return a.f.has('rel');
-        if (b.k === 'INF') return a.k === 'CLn' && a.f.has('act');
+        if (b.k === 'REL') return /^who/.test(b.t) ? a.f.has('rel') : (a.f.has('rel') || a.f.has('relt'));   // who = after a person, that = after a person or a thing
+        if (b.k === 'INF') return (a.k === 'CLn' || ppComma) && a.f.has('act');
         if (b.k === 'PP') return a.k === 'CLn' && ppOk(a, b.a);
         return false;
       case 'ADV': return b.k === 'CL2' || b.k === 'EXIST' || b.k === 'ADV2';
       case 'ADVP': return b.k === 'EXIST';
-      case 'V': return b.k === 'OBJ';                         // a verb that needs an object takes any noun phrase (even a silly one)
+      case 'V': return b.k === 'OBJ' || (b.k === 'NP' && a.a !== 'said' && isName(b.t));   // an object, or a name that is only a subject on its own card (Alice found | Doctor Jekyll | ...)                         // a verb that needs an object takes any noun phrase (even a silly one)
       case 'VBE': return b.k === 'PP' && (b.a === 'LOC' || b.a === 'BOX');
       case 'VBEPL': return b.k === 'OBJ' && b.a === 'THINGPL';
       case 'VI': return b.k === 'INF';
