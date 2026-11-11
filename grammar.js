@@ -7,7 +7,7 @@
  * Only the GRAMMAR counts, not the sense: silly pairs are fine (The face in the painting sailed to a faraway island).
  * Cards of the SAME story that follow each other in the story always fit (engine.js), whatever is written here.
  *
- * SPEC: for every story, 10 tokens (one per card, in story order). A token is  KIND[:arg][+flag+flag...]
+ * SPEC: for every story, one token per card (10; Giulia's deck 11 or 12), in story order. A token is  KIND[:arg][+flag+flag...]
  *  first halves (they start a sentence, capital letter):
  *    NP:<who>[+pl]   a subject (+pl = plural) that still needs its verb: H human, A animal, W wizard, B body part, O thing, P place
  *    CLn:<who>+flags a whole clause with no comma (She felt sad / They ran away);  CLc:<who>  the same but ending with a comma
@@ -139,10 +139,14 @@
 
   STORIES.forEach(s => {
     const toks = (SPEC[s.id] || s.specStr).split(' ');
-    if (toks.length !== 10) console.error('grammar.js: story', s.id, 'has', toks.length, 'tokens');
+    if (toks.length !== s.sets.medium.length) console.error('grammar.js: story', s.id, 'has', toks.length, 'tokens for', s.sets.medium.length, 'cards');
     s.spec = toks.map((t, i) => parse(t, s.sets.medium[i]));
   });
-  const spec = (games, c) => games[(c / 10) | 0].spec[c % 10];
+  // card number -> its token. The engine knows the length of every story of the deal (usually 10; Giulia's deck 12/11/12/11)
+  const spec = (games, c) => {
+    const E = window.StoryEngine;
+    return E ? games[E.story(c)].spec[E.beat(c) - 1] : games[(c / 10) | 0].spec[c % 10];
+  };
 
   /** card x may stand right before card y (cards of different stories) */
   window.midFits = (games, x, y) => fits(spec(games, x), spec(games, y));

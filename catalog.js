@@ -78,6 +78,7 @@
     narcissus: 'myth|love', bluebeard: 'fairy|crime', puss: 'fairy|animals,tricks', bremen: 'fairy|animals,friends',
     // ---- secret deck (giulia.js, loaded only with #giulia)
     gschool: 'giulia|school,friends', gcar: 'giulia|love', gbear: 'giulia|love,monsters,tricks', gfive: 'giulia|love,journey', groad: 'giulia|friends,journey', gclimb: 'giulia|sport',
+    gmosaic: 'giulia|school', gfair: 'giulia|friends', gbetter: 'giulia|sport,school', gfriends: 'giulia|friends,love', gcareer: 'giulia|friends,school', gtravel: 'giulia|journey,friends,animals', gclarinet: 'giulia|school', gfun: 'giulia|friends,tricks',
     snowqueen: 'fairy|magic,friends', aladdin: 'fairy|magic,treasure', wolfcry: 'fairy|animals,tricks', tortoise: 'fairy|animals,sport',
   };
 

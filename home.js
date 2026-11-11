@@ -53,15 +53,19 @@
 
   // ============================================================ GIULIA (secret page, only by the link #giulia)
   function renderGiulia() {
-    const ids = window.GIULIA_IDS || [], solved = new Set(P.solved());
+    const ids = window.GIULIA_IDS || [], solved = new Set(P.solved()), gstory = id => window.GIULIA_STORIES.find(s => s.id === id);
+    const list = ids.map(id => { const s = gstory(id); if (!solved.has(id)) return `<div class="gi-card lock"><div class="gi-sum"><i>${s.emoji}</i><b>${esc(s.title)}</b><span>🔒</span></div></div>`;
+      return `<details class="gi-card"><summary><i>${s.emoji}</i><b>${esc(s.title)}</b><span>✅</span></summary><p>${esc(s.full)}</p></details>`; }).join('');
     $('s-giulia').innerHTML = `<div class="gi-hero"><div class="gi-confetti" aria-hidden="true">🎂 🎈 🌈 🎉 ✨ 🎁</div>
         <h1>Happy birthday, Giulia!</h1>
-        <p class="lead">Tanti auguri, bossy girl! Six stories about you, cut in 60 cards. Put them back together.</p>
-        <a class="play" href="game.html?deck=giulia"><span class="tri">▶</span> Play your deck</a></div>
-      <h2 class="title">Your six stories</h2>
-      <p class="sub">Tap a title to read it. Or play first and read the story when you complete it!</p>
-      <div class="gi-list">${ids.map(id => { const s = story(id); return `<details class="gi-card"><summary><i>${s.emoji}</i><b>${esc(s.title)}</b><span>${solved.has(id) ? '✅' : ''}</span></summary><p>${esc(s.full)}</p></details>`; }).join('')}</div>`;
+        <a class="play" href="game.html?deck=giulia"><span class="tri">▶</span> Play</a></div>
+      <div class="gi-more"><button class="btn main" id="giShow">${giOpen ? '🙈 Hide' : '📖 Your stories'}</button></div>
+      <div class="gi-open" ${giOpen ? '' : 'hidden'}>
+        <p class="sub">You can read a story only when you complete it in the solitaire. Until then, you only see the title. 🔒</p>
+        <div class="gi-list">${list}</div></div>`;
   }
+  let giOpen = false;
+  $('s-giulia').addEventListener('click', e => { if (e.target.closest('#giShow')) { giOpen = !giOpen; renderGiulia(); } });
 
   // ============================================================ HOME
   function renderHome() {

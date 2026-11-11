@@ -1,6 +1,8 @@
 /**
  * SOLITERARY - rules (Klondike with stories instead of numbers). Pure logic, no DOM.
- * A card is a number: story * 10 + (beat - 1). story = 0..3 (the 4 stories of the deal), beat = 1..10 (1 = how the story starts).
+ * A card is a number: first card of its story + (beat - 1). story = 0..3 (the 4 stories of the deal), beat = 1..length (1 = how the story starts).
+ * Every story has 10 cards, unless setLens() gives other lengths (Giulia's deck: 12, 11, 12, 11). With four stories of 10 the numbers
+ * are story * 10 + (beat - 1), exactly as before, so a seed always gives the same deal.
  *
  * State:  tab[7]   columns, bottom of the pile first; the last card is the one you can touch
  *         hid[7]   how many cards at the start of each column are face down
@@ -14,16 +16,26 @@
  */
 (function (root) {
   'use strict';
-  const N = 10;               // sentences in a story
+  const N = 10;               // sentences in a story (the usual length)
   const COLS = 7;
-  const story = c => (c / N) | 0;
-  const beat = c => (c % N) + 1;
+  // the length of the 4 stories of the deal, and for every card number its story and its beat
+  let LENS, FIRST, STORY, BEAT, TOTAL;
+  function setLens(lens) {
+    LENS = (lens && lens.length === 4 ? lens : [N, N, N, N]).slice();
+    FIRST = []; STORY = []; BEAT = []; TOTAL = 0;
+    LENS.forEach((n, s) => { FIRST.push(TOTAL); for (let b = 1; b <= n; b++) { STORY.push(s); BEAT.push(b); } TOTAL += n; });
+  }
+  setLens(null);
+  const story = c => STORY[c];
+  const beat = c => BEAT[c];
+  const len = s => LENS[s];          // cards of story s
+  const first = s => FIRST[s];       // number of the first card of story s
   const cfg = { EMPTY_ANY: true, compat: null };   // compat(x, y): extra pairs that may be built on the columns (easy level)
 
   // x goes UNDER y on a column, so a column reads from top to bottom like a text: y must come right before x, in the same story
   // (the next sentence) or - with cfg.compat - because the two cards make good English together, even from different stories
   const canOnCard = (x, y) => (story(x) === story(y) && beat(y) + 1 === beat(x)) || (cfg.compat !== null && cfg.compat(y, x));
-  const canOnEmpty = x => cfg.EMPTY_ANY || beat(x) === N;
+  const canOnEmpty = x => cfg.EMPTY_ANY || beat(x) === len(story(x));
 
   function shuffle(a, rnd) {
     rnd = rnd || Math.random;
@@ -32,7 +44,7 @@
   }
 
   function deal(rnd) {
-    const deck = shuffle(Array.from({ length: 4 * N }, (_, i) => i), rnd);
+    const deck = shuffle(Array.from({ length: TOTAL }, (_, i) => i), rnd);
     const tab = [], hid = [];
     for (let i = 0; i < COLS; i++) { tab.push(deck.splice(0, i + 1)); hid.push(i); }
     return { tab, hid, found: [0, 0, 0, 0], stock: deck, waste: [] };
@@ -46,7 +58,7 @@
   // cards that follow each other in one story, in the right order (the golden frame): they can go to the story pile all together
   const inOrder = cs => cs.every((c, i) => i === 0 || (story(c) === story(cs[i - 1]) && beat(c) === beat(cs[i - 1]) + 1));
 
-  const won = s => s.found.every(n => n === N);
+  const won = s => s.found.every((n, i) => n === len(i));
 
   // after a card leaves a column: turn the last face-down card
   function flip(s, col) { if (s.tab[col].length && s.hid[col] >= s.tab[col].length) s.hid[col] = s.tab[col].length - 1; }
@@ -142,7 +154,7 @@
       if (++nodes > maxNodes || path0.length > 400) return null;
       const s = cl(s0), path = path0.slice();
       settle(s, path);
-      if (s.found.every(n => n === N)) return path;
+      if (won(s)) return path;
       const k = solverKey(s);
       if (seen.has(k)) return null;
       seen.add(k);
@@ -201,6 +213,6 @@
     return good || { from: { t: 's' } };
   }
 
-  const API = { N, COLS, story, beat, cfg, canOnCard, canOnEmpty, shuffle, deal, clone, won, draw, cardsOf, canMove, apply, inOrder, legalMoves, solve, stateKey, winnableDeal, hint };
+  const API = { N, COLS, story, beat, len, first, setLens, cfg, canOnCard, canOnEmpty, shuffle, deal, clone, won, draw, cardsOf, canMove, apply, inOrder, legalMoves, solve, stateKey, winnableDeal, hint };
   if (typeof module !== 'undefined' && module.exports) module.exports = API; else root.StoryEngine = API;
 })(typeof window !== 'undefined' ? window : globalThis);

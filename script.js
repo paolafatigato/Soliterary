@@ -48,7 +48,17 @@
     const k = c.split(':')[0], g = window.CATALOG && CATALOG.group(k, c.slice(k.length + 1));
     return g ? g.ids : null;
   }
+  // Giulia's deck: only her stories, two of 12 cards and two of 11 in the order 12, 11, 12, 11 (her birthday, 12/11).
+  // Stories she already finished come back only when there are no new ones of that length.
+  function giuliaGames() {
+    const pool = STORIES.filter(s => window.GIULIA_IDS.includes(s.id)), done = new Set(Progress.solved());       // like a Pro player: a finished story comes back only when all the others are done
+    const take = (list, n) => E.shuffle(list.filter(s => !done.has(s.id))).concat(E.shuffle(list.filter(s => done.has(s.id)))).slice(0, n);
+    const twelve = take(pool.filter(s => s.sets[level].length === 12), 2), eleven = take(pool.filter(s => s.sets[level].length === 11), 2);
+    const four = twelve.length === 2 && eleven.length === 2 ? [twelve[0], eleven[0], twelve[1], eleven[1]] : take(pool, 4);
+    return four.map(g => Object.assign({}, g));
+  }
   function pickStories(first) {
+    if (params.get('deck') === 'giulia' && window.GIULIA_IDS) { games = giuliaGames(); applyLevel(); return; }
     const pool = catIds(), base = pool ? STORIES.filter(s => pool.includes(s.id)) : STORIES;
     const chosen = first ? (params.get('stories') || '').split(',').filter((id, i, a) => STORIES.some(s => s.id === id) && a.indexOf(id) === i).slice(0, 4) : [];
     const need = 4 - chosen.length;
@@ -66,6 +76,7 @@
   // every story has its text for the three levels (levels.js): the cards show the one of the chosen level
   function applyLevel() {
     games.forEach(g => { g.lines = g.sets[level]; });
+    E.setLens(games.map(g => g.lines.length));       // 10 cards each, or 12/11/12/11 in Giulia's deck
     // medium: on the columns, two halves that make a good sentence together fit even from different stories
     E.cfg.compat = (x, y) => midFits(games, x, y);
     document.body.classList.remove('lvl-easy', 'lvl-medium', 'lvl-hard');
@@ -158,9 +169,9 @@
     h += `<div class="pile waste" data-pile="waste" style="grid-column:2">${wasteTop !== null ? card(wasteTop, { sel: selWaste, top: 0 }) : ''}</div>`;
     for (let i = 0; i < 4; i++) {
       const n = S.found[i], g = games[i];
-      const top = n ? i * E.N + n - 1 : null;
-      h += `<div class="pile found c${i}${n === E.N ? ' done' : ''}" data-pile="found:${i}" style="grid-column:${4 + i}">`
-        + (n ? card(top, { top: 0 }) + `<b class="cnt">${n}/${E.N}</b>`
+      const top = n ? E.first(i) + n - 1 : null;
+      h += `<div class="pile found c${i}${n === E.len(i) ? ' done' : ''}" data-pile="found:${i}" style="grid-column:${4 + i}">`
+        + (n ? card(top, { top: 0 }) + `<b class="cnt">${n}/${E.len(i)}</b>`
              : `<div class="ghost"><em>${g.emoji}</em><small>${esc(g.title)}</small></div>`) + '</div>';
     }
     h += '</div><div class="grid">';
@@ -191,7 +202,7 @@
     $('board').innerHTML = h;
 
     visited.add(E.stateKey(S));
-    const done = S.found.filter(n => n === E.N).length;
+    const done = S.found.filter((n, i) => n === E.len(i)).length;
     $('stats').innerHTML = `<span>⏱ <b id="clock">${Progress.fmt(elapsed())}</b></span><span><i class="ic">👆</i><em class="lbl">Moves </em><b>${moves}</b></span><span><i class="ic">📚</i><em class="lbl">Stories </em><b>${done}/4</b></span>`;
     $('undoBtn').disabled = !hist.length;
     renderDrawer();
@@ -203,18 +214,18 @@
   const srcLine = g => g.source ? `<p class="src">📖 Inspired by <b>“${esc(g.source.book)}”</b> by ${esc(g.source.author)}. Read the original!</p>` : '';
 
   // what is on a story pile so far, as a text
-  const told = (g, n) => g.lines.slice(0, n).join(' ') + (n < E.N ? ' …' : '');
+  const told = (g, n) => g.lines.slice(0, n).join(' ') + (n < g.lines.length ? ' …' : '');
   function showStory(i) {
     const g = games[i], n = S.found[i];
-    $('modalBox').innerHTML = `<h2>${g.emoji} ${esc(g.title)} <small style="font:700 15px Nunito">${n}/${E.N}</small></h2><div class="story c${i}"><p class="told big">${esc(told(g, n))}</p>${srcLine(g)}</div><div class="row"><button class="btn btn-main" data-action="close">Back to the table</button></div>`;
+    $('modalBox').innerHTML = `<h2>${g.emoji} ${esc(g.title)} <small style="font:700 15px Nunito">${n}/${E.len(i)}</small></h2><div class="story c${i}"><p class="told big">${esc(told(g, n))}</p>${srcLine(g)}</div><div class="row"><button class="btn btn-main" data-action="close">Back to the table</button></div>`;
     $('modal').hidden = false;
   }
 
   function renderDrawer() {
     $('drawerBody').innerHTML = games.map((g, i) => {
       const n = S.found[i];
-      return `<div class="story c${i}"><h3>${g.emoji} ${esc(g.title)} <small>${n}/${E.N}</small></h3>
-        ${n ? `<p class="told">${esc(told(g, n))}</p>${n === E.N ? srcLine(g) : ''}` : '<div class="empty">Waiting for the first card…</div>'}</div>`;
+      return `<div class="story c${i}"><h3>${g.emoji} ${esc(g.title)} <small>${n}/${E.len(i)}</small></h3>
+        ${n ? `<p class="told">${esc(told(g, n))}</p>${n === E.len(i) ? srcLine(g) : ''}` : '<div class="empty">Waiting for the first card…</div>'}</div>`;
     }).join('') + unlockedList();
   }
 
@@ -265,7 +276,7 @@
     remember();
     E.apply(S, { from, to });
     moves++; sel = null; clearHint();
-    S.found.forEach((n, i) => { if (n === E.N) markSolved(games[i].id); });
+    S.found.forEach((n, i) => { if (n === E.len(i)) markSolved(games[i].id); });
     const finished = E.won(S) && !won;
     if (finished) { won = true; tEnd = Date.now(); clearInterval(clockTimer); }
     render();
@@ -369,6 +380,25 @@
 
   // ------------------------------------------------------------ windows
   function showRules() {
+    if (params.get('deck') === 'giulia') {         // the rules of Giulia's secret deck are in Italian
+      $('modalBox').innerHTML = `<h2>Come si gioca</h2>
+      <p>Quattro storie si sono mescolate nelle carte. Ogni storia ha il suo <span class="chip c0">colore</span> e la sua emoji. Rimetti ogni frase al suo posto per <b>pulire il tavolo</b>!</p>
+      <ul>
+        <li><b>I mazzetti delle storie</b> (in alto a destra): costruisci ogni storia dalla <b>prima</b> all’<b>ultima</b> frase. Gli spazi vuoti mostrano quali storie ci sono in questa partita.</li>
+        <li><b>Le colonne si leggono dall’alto in basso, come un testo.</b> Metti una carta <b>sotto</b> quella che viene subito <b>prima</b> nella storia. Quando le carte sono nell’ordine giusto si accende una <b>cornice luminosa</b> ✨. Ogni gruppo ha il suo colore: se due gruppi vicini hanno colori diversi, insieme non sono nell’ordine giusto!</li>
+        <li><b>Provale insieme:</b> una carta può andare anche sotto una carta di <i>un’altra</i> storia, se le due leggendole di seguito fanno una frase inglese corretta. Ricorda: dopo un <b>punto</b> c’è la <b>lettera maiuscola</b>; dopo una virgola (o niente) la <b>minuscola</b>, a meno che sia un nome. È solo provvisorio: la cornice si accende solo se le carte sono nell’ordine della <i>loro</i> storia. Un gruppo illuminato si sposta tutto insieme e va al suo mazzetto se la sua prima carta è la prossima che serve.</li>
+        <li>Puoi spostare un intero gruppo di carte. Quando scopri una carta coperta, si gira.</li>
+        <li>Una <b>colonna vuota</b> accetta qualsiasi frase (o gruppo).</li>
+        <li>Clicca il <b>mazzo</b> (in alto a sinistra) per pescare una frase. Quando è finito, cliccalo ancora per rigirare le carte.</li>
+        <li>Per muovere: clicca una frase e poi il suo posto, oppure trascinala. Il <b>doppio clic</b> la manda al suo mazzetto (sul telefono: tocca di nuovo la carta selezionata).</li>
+        <li>Leggi gli indizi! <i>Once upon a time, then, suddenly, after that, the next day, finally…</i> ti dicono quando succedono le cose. La frase che indichi appare a lettere grandi in basso.</li>
+        <li>Sei bloccata? Usa <b>Hint</b> (suggerimento) o <b>Undo</b> (annulla). Ogni partita si può risolvere! 💪</li>
+        <li>Quando completi una storia, puoi rileggerla nella tua pagina. Buon compleanno, Giulia! 🎂</li>
+      </ul>
+      <div class="row"><button class="btn btn-main" data-action="close">Giochiamo!</button></div>`;
+      $('modal').hidden = false;
+      return;
+    }
     $('modalBox').innerHTML = `<h2>How to play</h2>
       <p>Four short stories got mixed up in the cards. Each story has its own <span class="chip c0">color</span> and emoji. Put every sentence back in the right order to <b>clear the table</b>!</p>
       <ul>

@@ -253,3 +253,7 @@ main { max-width: 1060px; margin: 0 auto; padding: var(--pad); }
 .gi-card summary i { font-style: normal; font-size: 28px; }
 .gi-card summary b { font-family: 'Fredoka', sans-serif; flex: 1; }
 .gi-card p { margin: 10px 0 2px; font-weight: 600; line-height: 1.5; }
+.gi-card.lock { opacity: .75; }
+.gi-sum { display: flex; align-items: center; gap: 10px; font-size: 18px; }
+.gi-sum i { font-style: normal; font-size: 28px; } .gi-sum b { font-family: 'Fredoka', sans-serif; flex: 1; }
+.gi-more { text-align: center; margin-bottom: 14px; }
